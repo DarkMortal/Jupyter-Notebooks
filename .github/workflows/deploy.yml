@@ -51,72 +51,37 @@ jobs:
       # -------------------------------------------------
       - name: Generate index.html
         run: |
-          cat > _site/index.html << 'EOF'
-          <!DOCTYPE html>
-          <html lang="en">
+          python3 << 'EOF'
+          import os
+      
+          root = "."
+          entries = sorted(os.listdir(root))
+      
+          html = """<!DOCTYPE html>
+          <html>
           <head>
-            <meta charset="utf-8">
-            <title>Jupyter Notebooks</title>
-            <style>
-              body {font-family: system-ui, sans-serif; margin: 40px; background: #fff; color: #1a1a1a;}
-              h1 {color: #2c3e50; margin-bottom: 24px;}
-              ul {list-style: none; padding: 0; margin: 0;}
-              li {margin: 6px 0;}
-              details {margin: 2px 0;}
-              summary {
-                cursor: pointer; color: #2980b9; font-weight: 600;
-                padding-left: 22px; position: relative; list-style: none;
-              }
-              summary::before {
-                content: "right arrow"; position: absolute; left: 0; font-size: 16px;
-              }
-              details[open] > summary::before { content: "down arrow"; }
-              summary::-webkit-details-marker { display: none; }
-              ul ul {margin-left: 28px;}
-              a {color: #2980b9; text-decoration: none; font-family: 'Courier New', monospace;}
-              a:hover {text-decoration: underline;}
-              .file::before {content: "• "; color: #7f8c8d;}
-            </style>
+              <meta charset="UTF-8">
+              <title>Index</title>
           </head>
           <body>
-            <h1>Jupyter Notebooks</h1>
-            <ul>
+              <h1>Files & Folders</h1>
+              <ul>
+          """
+      
+          for entry in entries:
+              # Skip the index file (because we are generating it)
+              if entry == "index.html":
+                  continue
+      
+              html += f"<li><a href='{entry}'>{entry}</a></li>\n"
+      
+          html += """</ul>
+          </body>
+          </html>"""
+      
+          with open("index.html", "w") as f:
+              f.write(html)
           EOF
-
-          # === BUILD TREE ===
-          # Get all paths: folders first, then files
-          (
-            find _site -type d | sed 's|^_site/||' | sort
-            find _site -name "*.html" ! -name "index.html" | sed 's|^_site/||' | sort
-          ) | while IFS= read -r path; do
-            if [[ -d "_site/$path" ]]; then
-              name=$(basename "$path")
-              depth=$(echo "$path" | awk -F'/' '{print NF-1}')
-              indent=$(printf '%*s' $((depth * 4)) '')
-              echo "$indent<details><summary>$name/</summary><ul>" >> _site/index.html
-            else
-              name=$(basename "$path")
-              dir=$(dirname "$path")
-              if [[ "$dir" == "." ]]; then
-                depth=0
-              else
-                depth=$(echo "$dir" | awk -F'/' '{print NF-1}')
-              fi
-              indent=$(printf '%*s' $(((depth + 1) * 4)) '')
-              echo "$indent<li class=\"file\"><a href=\"$path\">$name</a></li>" >> _site/index.html
-            fi
-          done
-
-          # === CLOSE ALL TAGS ===
-          find _site -type d | sed 's|^_site/||' | sort -r | while IFS= read -r dir; do
-            [[ "$dir" == "." ]] && continue
-            depth=$(echo "$dir" | awk -F'/' '{print NF-1}')
-            indent=$(printf '%*s' $((depth * 4)) '')
-            echo "$indent</ul></details>" >> _site/index.html
-          done
-
-          # End HTML
-          echo "</ul></body></html>" >> _site/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
