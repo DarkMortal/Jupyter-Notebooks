@@ -58,57 +58,64 @@ jobs:
             <meta charset="utf-8">
             <title>Jupyter Notebooks</title>
             <style>
-              body {font-family: system-ui, sans-serif; margin: 2rem; background: #fff; color: #1a1a1a;}
-              h1 {color: #2c3e50; margin-bottom: 1.5rem;}
-              details {margin: 0.3rem 0;}
+              body {font-family: system-ui, sans-serif; margin: 40px; background: #fff; color: #1a1a1a;}
+              h1 {color: #2c3e50; margin-bottom: 24px;}
+              ul {list-style: none; padding: 0; margin: 0;}
+              li {margin: 6px 0;}
+              details {margin: 2px 0;}
               summary {
-                font-weight: 600; color: #2980b9; cursor: pointer; list-style: none;
-                padding-left: 1.6rem; position: relative;
+                cursor: pointer; color: #2980b9; font-weight: 600;
+                padding-left: 22px; position: relative; list-style: none;
               }
-              summary::before {content: "right arrow"; position: absolute; left: 0; font-size: 1rem;}
-              details[open] > summary::before {content: "down arrow";}
-              summary::-webkit-details-marker {display: none;}
-              ul {margin: 0.4rem 0 0.4rem 1.8rem; padding: 0; list-style: none;}
-              li {margin: 0.3rem 0; padding-left: 1.4rem; position: relative;}
-              li::before {content: "•"; color: #7f8c8d; position: absolute; left: 0;}
-              a {color: #2980b9; text-decoration: none; font-family: monospace;}
+              summary::before {
+                content: "right arrow"; position: absolute; left: 0; font-size: 16px;
+              }
+              details[open] > summary::before { content: "down arrow"; }
+              summary::-webkit-details-marker { display: none; }
+              ul ul {margin-left: 28px;}
+              a {color: #2980b9; text-decoration: none; font-family: 'Courier New', monospace;}
               a:hover {text-decoration: underline;}
+              .file::before {content: "• "; color: #7f8c8d;}
             </style>
           </head>
           <body>
             <h1>Jupyter Notebooks</h1>
+            <ul>
           EOF
 
-          # Build tree with proper nesting
-          echo "<ul>" >> _site/index.html
-
-          # List all paths: folders first, then files
+          # === BUILD TREE ===
+          # Get all paths: folders first, then files
           (
-            find _site -type d | sed 's|^_site/||' | grep -v '^$' | sort
-            find _site -name '*.html' -not -name 'index.html' | sed 's|^_site/||' | sort
+            find _site -type d | sed 's|^_site/||' | sort
+            find _site -name "*.html" ! -name "index.html" | sed 's|^_site/||' | sort
           ) | while IFS= read -r path; do
             if [[ -d "_site/$path" ]]; then
               name=$(basename "$path")
-              depth=$(echo "$path" | tr -cd '/' | wc -c)
-              indent=$((depth * 2))
-              printf '%*s<details><summary>%s/</summary><ul>\n' "$indent" "" "$name"
+              depth=$(echo "$path" | awk -F'/' '{print NF-1}')
+              indent=$(printf '%*s' $((depth * 4)) '')
+              echo "$indent<details><summary>$name/</summary><ul>" >> _site/index.html
             else
               name=$(basename "$path")
               dir=$(dirname "$path")
-              if [[ "$dir" == "." ]]; then depth=0; else depth=$(echo "$dir" | tr -cd '/' | wc -c); fi
-              indent=$(( (depth + 1) * 2 ))
-              printf '%*s<li><a href="%s">%s</a></li>\n' "$indent" "" "$path" "$name"
+              if [[ "$dir" == "." ]]; then
+                depth=0
+              else
+                depth=$(echo "$dir" | awk -F'/' '{print NF-1}')
+              fi
+              indent=$(printf '%*s' $(((depth + 1) * 4)) '')
+              echo "$indent<li class=\"file\"><a href=\"$path\">$name</a></li>" >> _site/index.html
             fi
-          done >> _site/index.html
+          done
 
-          # Close all open tags in reverse
+          # === CLOSE ALL TAGS ===
           find _site -type d | sed 's|^_site/||' | sort -r | while IFS= read -r dir; do
             [[ "$dir" == "." ]] && continue
-            depth=$(echo "$dir" | tr -cd '/' | wc -c)
-            indent=$((depth * 2))
-            printf '%*s</ul></details>\n' "$indent" ""
-          done >> _site/index.html
+            depth=$(echo "$dir" | awk -F'/' '{print NF-1}')
+            indent=$(printf '%*s' $((depth * 4)) '')
+            echo "$indent</ul></details>" >> _site/index.html
+          done
 
+          # End HTML
           echo "</ul></body></html>" >> _site/index.html
 
       - name: Setup Pages
