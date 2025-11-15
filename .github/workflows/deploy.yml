@@ -2,7 +2,7 @@ name: Deploy Jupyter Notebooks to GitHub Pages
 
 on:
   push:
-    branches: [main]  # Change to your default branch if different
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -11,35 +11,105 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'  # Choose a Python version that suits your notebooks
+          python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install nbconvert
         run: |
           python -m pip install --upgrade pip
           pip install nbconvert jupyter
 
+      # -------------------------------------------------
+      # 1. Convert .ipynb → .html (preserve folder tree)
+      # -------------------------------------------------
       - name: Convert notebooks to HTML
         run: |
-          # Find all .ipynb files and convert them to HTML, preserving directory structure
-          find . -name '*.ipynb' -not -path './.github/*' | while read notebook; do
-            dir=$(dirname "$notebook")
-            base=$(basename "$notebook" .ipynb)
+          find . -name '*.ipynb' -not -path './.github/*' -not -path './_site/*' | while read nb; do
+            dir=$(dirname "$nb")
+            base=$(basename "$nb" .ipynb)
             mkdir -p "_site/$dir"
-            jupyter nbconvert --to html --output-dir "_site/$dir" --output "$base.html" "$notebook"
+            jupyter nbconvert --to html \
+              --output-dir "_site/$dir" \
+              --output "$base.html" \
+              "$nb"
           done
+
+      # -------------------------------------------------
+      # 2. Generate a dropdown-style index.html
+      # -------------------------------------------------
+      - name: Generate dropdown index.html
+        run: |
+          # Start HTML
+          cat > _site/index.html <<'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <title>Jupyter Notebooks</title>
+            <style>
+              body {font-family: Arial, sans-serif; margin: 2rem; line-height: 1.6; background:#f9f9fb; color:#333;}
+              h1 {color:#2c3e50; margin-bottom:1rem;}
+              details {margin-bottom:.4rem; cursor:pointer;}
+              summary {font-weight:600; color:#2980b9; list-style:none; outline:none;}
+              summary::-webkit-details-marker {display:none;}
+              summary::before {content:"right arrow "; margin-right:.4rem; font-size:1.1rem;}
+              details[open] summary::before {content:"down arrow ";}
+              a {color:#2980b9; text-decoration:none;}
+              a:hover {text-decoration:underline;}
+              ul {margin: .2rem 0 .2rem 1.2rem; padding:0;}
+              li {margin:.15rem 0;}
+            </style>
+          </head>
+          <body>
+            <h1>Jupyter Notebooks</h1>
+          EOF
+
+          # Build the nested <details> structure
+          # First, create all folders
+          find _site -type d | sort | while read dir; do
+            rel="${dir#_site/}"
+            [[ "$rel" == "." ]] && continue
+            depth=$(echo "$rel" | tr -cd '/' | wc -c)
+            indent=$(printf '%*s' $((depth*2)) '')
+            echo "$indent<details><summary>$(basename "$rel")/</summary><ul>" >> _site/index.html
+          done
+
+          # Then, add HTML files
+          find _site -name '*.html' -not -name 'index.html' | sort | while read file; do
+            rel="${file#_site/}"
+            dir=$(dirname "$rel")
+            base=$(basename "$rel")
+            depth=$(echo "$dir" | tr -cd '/' | wc -c)
+            indent=$(printf '%*s' $(( (depth+1)*2 )) '')
+            echo "$indent<li><a href=\"$rel\">$base</a></li>" >> _site/index.html
+          done
+
+          # Close all open tags in reverse order
+          find _site -type d | sort -r | while read dir; do
+            rel="${dir#_site/}"
+            [[ "$rel" == "." ]] && continue
+            depth=$(echo "$rel" | tr -cd '/' | wc -c)
+            indent=$(printf '%*s' $((depth*2)) '')
+            echo "$indent</ul></details>" >> _site/index.html
+          done
+
+          # Finish HTML
+          cat >> _site/index.html <<'EOF'
+          </body>
+          </html>
+          EOF
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
