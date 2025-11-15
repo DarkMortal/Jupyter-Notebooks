@@ -51,65 +51,93 @@ jobs:
       # -------------------------------------------------
       - name: Generate index.html
         run: |
-          cat > _site/index.html << 'EOF'
+          cat > _site/index.html <<'EOF'
           <!DOCTYPE html>
           <html lang="en">
           <head>
-            <meta charset="utf-8">
-            <title>Jupyter Notebooks</title>
-            <style>
-              body {font-family: system-ui, sans-serif; margin: 2rem; background: #fff; color: #1a1a1a;}
-              h1 {color: #2c3e50; margin-bottom: 1.5rem;}
-              details {margin: 0.3rem 0;}
-              summary {
-                font-weight: 600; color: #2980b9; cursor: pointer; list-style: none;
-                padding-left: 1.6rem; position: relative;
-              }
-              summary::before {content: "→  "; position: absolute; left: 0; font-size: 1rem;}
-              details[open] > summary::before {content: "↓  ";}
-              summary::-webkit-details-marker {display: none;}
-              ul {margin: 0.4rem 0 0.4rem 1.8rem; padding: 0; list-style: none;}
-              li {margin: 0.3rem 0; padding-left: 1.4rem; position: relative;}
-              li::before {content: "•"; color: #7f8c8d; position: absolute; left: 0;}
-              a {color: #2980b9; text-decoration: none; font-family: monospace;}
-              a:hover {text-decoration: underline;}
-            </style>
+          <meta charset="utf-8">
+          <title>Jupyter Notebooks</title>
+          <style>
+            :root { --indent: 1.5rem; }
+            body {font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 2rem; line-height: 1.6; background:#ffffff; color:#1a1a1a;}
+            h1 {color:#2c3e50; margin-bottom:1.5rem; font-size:1.8rem;}
+          
+            details { margin: 0.25rem 0; }
+            summary {
+              font-weight: 600; color: #2980b9; cursor: pointer;
+              list-style: none; padding: 0.25rem 0; position: relative;
+              padding-left: var(--indent);
+            }
+            summary::before {
+              content: "▶"; position: absolute; left: 0; font-size: 0.9rem;
+            }
+            details[open] > summary::before { content: "▼"; }
+          
+            summary::-webkit-details-marker { display: none; }
+          
+            ul { margin: 0.4rem 0 0.4rem var(--indent); padding: 0; list-style: none; }
+            li { margin: 0.3rem 0; position: relative; padding-left: 1.2rem; }
+            li::before { content: "•"; color:#7f8c8d; position: absolute; left:0; font-weight:bold; }
+          
+            a { color: #2980b9; text-decoration: none; font-family: 'Courier New', monospace; font-size: 0.95rem; }
+            a:hover { text-decoration: underline; color:#1a73e8; }
+          </style>
           </head>
           <body>
-            <h1>Jupyter Notebooks</h1>
+          <h1>Jupyter Notebooks</h1>
+          <ul>
           EOF
-
-          # Build tree with proper nesting
-          echo "<ul>" >> _site/index.html
-
-          # List all paths: folders first, then files
-          (
-            find _site -type d | sed 's|^_site/||' | grep -v '^$' | sort
-            find _site -name '*.html' -not -name 'index.html' | sed 's|^_site/||' | sort
-          ) | while IFS= read -r path; do
-            if [[ -d "_site/$path" ]]; then
-              name=$(basename "$path")
-              depth=$(echo "$path" | tr -cd '/' | wc -c)
-              indent=$((depth * 2))
-              printf '%*s<details><summary>%s/</summary><ul>\n' "$indent" "" "$name"
-            else
-              name=$(basename "$path")
-              dir=$(dirname "$path")
-              if [[ "$dir" == "." ]]; then depth=0; else depth=$(echo "$dir" | tr -cd '/' | wc -c); fi
-              indent=$(( (depth + 1) * 2 ))
-              printf '%*s<li><a href="%s">%s</a></li>\n' "$indent" "" "$path" "$name"
-            fi
-          done >> _site/index.html
-
-          # Close all open tags in reverse
-          find _site -type d | sed 's|^_site/||' | sort -r | while IFS= read -r dir; do
-            [[ "$dir" == "." ]] && continue
-            depth=$(echo "$dir" | tr -cd '/' | wc -c)
-            indent=$((depth * 2))
-            printf '%*s</ul></details>\n' "$indent" ""
-          done >> _site/index.html
-
-          echo "</ul></body></html>" >> _site/index.html
+          
+          # ---------------------------------------------
+          # BUILD DIRECTORY TREE STRUCTURE
+          # ---------------------------------------------
+          
+          # List and sort directories first, then files
+          mapfile -t entries < <(
+            find _site -mindepth 1 -printf "%P\n" \
+            | sort -t '/' -k1,1 -k2,2
+          )
+          
+          current_depth=0
+          
+          for path in "${entries[@]}"; do
+              full="_site/$path"
+          
+              # Count nesting depth
+              depth=$(grep -o "/" <<< "$path" | wc -l)
+          
+              # Close levels if needed
+              while (( depth < current_depth )); do
+                  printf '%*s</ul></details>\n' $((current_depth*2)) "" >> _site/index.html
+                  ((current_depth--))
+              done
+          
+              basename=$(basename "$path")
+          
+              if [[ -d "$full" ]]; then
+                  # Directory entry
+                  printf '%*s<details><summary>%s/</summary><ul>\n' $((depth*2)) "" "$basename" >> _site/index.html
+                  ((current_depth++))
+              else
+                  # File entry
+                  printf '%*s<li><a href="%s">%s</a></li>\n' $(((depth+1)*2)) "" "$path" "$basename" >> _site/index.html
+              fi
+          done
+          
+          # Close remaining open lists
+          while (( current_depth > 0 )); do
+              printf '%*s</ul></details>\n' $((current_depth*2)) "" >> _site/index.html
+              ((current_depth--))
+          done
+          
+          # ---------------------------------------------
+          # END HTML
+          # ---------------------------------------------
+          cat >> _site/index.html <<'EOF'
+          </ul>
+          </body>
+          </html>
+          EOF
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
