@@ -79,8 +79,8 @@ jobs:
             </style>
           </head>
           <body>
-            <h1>DSA basics</h1>
-            <h2>By Saptarshi Dey</h2>
+            <h1>DSA with python</h1>
+            <h3>By Saptarshi Dey</h3>
             <ul id="tree">
           EOF
 
