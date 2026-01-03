@@ -51,6 +51,7 @@ jobs:
       # -------------------------------------------------
       - name: Generate index.html
         run: |
+          LAST_UPDATED="$(date '+%d %b, %Y %I:%M %p')"
           cat > _site/index.html <<'EOF'
           <!DOCTYPE html>
           <html lang="en">
@@ -76,11 +77,19 @@ jobs:
               li::before {content: "•"; color: #7f8c8d; position: absolute; left: 0; font-weight: bold;}
               a {color: #2980b9; text-decoration: none; font-family: 'Courier New', monospace; font-size: 0.95rem;}
               a:hover {text-decoration: underline; color: #1a73e8;}
+              .last-updated {
+                font-size: 0.85rem;
+                color: #7f8c8d;
+                margin-bottom: 1rem;
+              }
             </style>
           </head>
           <body>
             <h1>DSA with Python</h1>
             <h3>By Saptarshi Dey</h3>
+            <span class="last-updated">
+              Last updated: {{LAST_UPDATED}}
+            </span>
             <ul id="tree">
           EOF
 
