@@ -52,7 +52,7 @@ jobs:
       - name: Generate index.html
         run: |
           LAST_UPDATED="$(date '+%d %b, %Y %I:%M %p')"
-          cat > _site/index.html <<'EOF'
+          cat > _site/index.html <<EOF
           <!DOCTYPE html>
           <html lang="en">
           <head>
@@ -88,7 +88,7 @@ jobs:
             <h1>DSA with Python</h1>
             <h3>By Saptarshi Dey</h3>
             <span class="last-updated">
-              Last updated: {{LAST_UPDATED}}
+              Last updated: $LAST_UPDATED
             </span>
             <ul id="tree">
           EOF
