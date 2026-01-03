@@ -105,6 +105,7 @@ jobs:
               depth=$(echo "$path" | tr -cd '/' | wc -c)
             else
               depth=$(echo "$dir" | tr -cd '/' | wc -c)
+            fi
           
             # CLOSE when depth decreases
             while (( prev_depth > depth )); do
