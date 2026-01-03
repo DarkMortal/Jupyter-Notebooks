@@ -99,13 +99,7 @@ jobs:
           prev_depth=0
           while IFS= read -r path; do
             # TODO: count number of / in $path
-            depth=0
-            if [[ -d "_site/$path" ]]; then
-              depth=$(echo "$path" | tr -cd '/' | wc -c)
-            else
-              dir=$(dirname "$path")
-              depth=$(echo "$dir" | tr -cd '/' | wc -c)
-            fi
+            depth=$(echo "$path" | tr -cd '/' | wc -c)
           
             # CLOSE when depth decreases
             while (( prev_depth > depth )); do
@@ -113,18 +107,19 @@ jobs:
               printf '%*s</ul></details>\n' "$indent" ""
               ((prev_depth--))
             done
+            
             if [[ -d "_site/$path" ]]; then
               name=$(basename "$path")
               indent=$((depth * 2))
               printf '%*s<details><summary>%s/</summary><ul>\n' \
                 "$indent" "" "$name"
-              ((prev_depth++))
             else
               name=$(basename "$path")
               indent=$((depth * 2))
               printf '%*s<li><a href="%s">%s</a></li>\n' \
                 "$indent" "" "$path" "$name"
             fi
+            prev_depth=$depth
           done >> _site/index.html
 
           # === CLOSE ALL REMAINING TAGS IN REVERSE ORDER ===
