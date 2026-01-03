@@ -79,7 +79,8 @@ jobs:
             </style>
           </head>
           <body>
-            <h1>Jupyter Notebooks</h1>
+            <h1>DSA basics</h1>
+            <h2>By Saptarshi Dey</h2>
             <ul id="tree">
           EOF
 
@@ -90,7 +91,7 @@ jobs:
           # === BUILD TREE BY PATH PREFIX ===
           # Sort all paths: folders first, then files
           {
-            find $rootDir -type d | sed "s|^$rootDir/||" | sort
+            find $rootDir -mindepth 1 -type d | sed "s|^$rootDir/||" | sort
             find $rootDir -name '*.html' -not -name 'index.html' | sed "s|^$rootDir/||" | sort
           } | awk '
           BEGIN { }
@@ -115,6 +116,7 @@ jobs:
             else
               # File
               name=$(basename "$path")
+              name="${name%.*}"
               printf '%*s<li><a href="%s">%s</a></li>\n' "$fileIndent" "" "$path" "$name"
             fi
           done >> _site/index.html
