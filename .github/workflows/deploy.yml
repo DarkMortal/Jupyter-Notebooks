@@ -83,53 +83,49 @@ jobs:
             <ul id="tree">
           EOF
 
+          dirIndent=1
+          fileIndent=3
+          prev_depth=0
+          rootDir="_site"
           # === BUILD TREE BY PATH PREFIX ===
           # Sort all paths: folders first, then files
           {
-            find _site -type d | sed 's|^_site/||' | sort
-            find _site -name '*.html' -not -name 'index.html' | sed 's|^_site/||' | sort
+            find $rootDir -type d | sed "s|^$rootDir/||" | sort
+            find $rootDir -name '*.html' -not -name 'index.html' | sed "s|^$rootDir/||" | sort
           } | awk '
-          BEGIN { print "<!-- TREE START -->" }
+          BEGIN { }
           {
             gsub(/\/\//, "/")
             if ($0 ~ /\/$/) { type="dir"; sub(/\/$/, "", $0) } else type="file"
             print type "|" $0
           }
           ' | sort -t'|' -k2 | cut -d'|' -f2- | \
-          prev_depth=0
           while IFS= read -r path; do
-            while (( prev_depth > 0 )); do
-              indent=$((prev_depth * 2))
-              printf '%*s</ul></details>\n' "$indent" ""
-              ((prev_depth--))
+            depth=$(echo "$path" | tr -cd '/' | wc -c)
+            while (( prev_depth > depth )); do
+              printf '%*s</ul></details>\n' "$dirIndent" ""
+              prev_depth=$((prev_depth - 1))
             done
 
-            # Check if folder exists
-            if [[ -d "_site/$path" ]]; then
+            if [[ -d "$rootDir/$path" ]]; then
               # Folder
               name=$(basename "$path")
-              depth=$(echo "$path" | tr -cd '/' | wc -c)
-              indent=$((depth * 2))
-              printf '%*s<details><summary>%s/</summary><ul>\n' "$indent" "" "$name"
-              ((prev_depth++))
+              prev_depth=$((prev_depth + 1))
+              printf '%*s<details><summary>%s/</summary><ul>\n' "$fileIndent" "" "$name"
             else
               # File
               name=$(basename "$path")
-              dir=$(dirname "$path")
-              depth=$(echo "$dir" | tr -cd '/' | wc -c)
-              indent=$((depth * 2))
-              printf '%*s<li><a href="%s">%s</a></li>\n' "$indent" "" "$path" "$name"
+              printf '%*s<li><a href="%s">%s</a></li>\n' "$fileIndent" "" "$path" "$name"
             fi
           done >> _site/index.html
 
-          # === CLOSE ALL REMIANING TAGS IN REVERSE ORDER ===
+          # === CLOSE ALL REMIAINING TAGS IN REVERSE ORDER ===
           while (( prev_depth > 0 )); do
-            indent=$((prev_depth * 2))
-            printf '%*s</ul></details>\n' "$indent" ""
-            ((prev_depth--))
+            printf '%*s</ul></details>\n' "$dirIndent" ""
+            prev_depth=$((prev_depth - 1))
           done >> _site/index.html
 
-          # End of HTML
+          # End HTML
           cat >> _site/index.html <<'EOF'
             </ul>
           </body>
