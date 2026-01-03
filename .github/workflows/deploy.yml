@@ -86,8 +86,8 @@ jobs:
           # === BUILD TREE BY PATH PREFIX ===
           # Sort all paths: folders first, then files
           {
-            find _site -type d | sed 's|^_site/||' |
-            find _site -name '*.html' -not -name 'index.html' | sed 's|^_site/||' |
+            find _site -type d | sed 's|^_site/||' 
+            find _site -name '*.html' -not -name 'index.html' | sed 's|^_site/||'
           } | awk '
           BEGIN { print "<!-- TREE START -->" }
           {
