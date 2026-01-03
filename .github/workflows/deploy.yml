@@ -108,7 +108,7 @@ jobs:
               name=$(basename "$path")
               dir=$(dirname "$path")
               depth=$(echo "$dir" | tr -cd '/' | wc -c)
-              indent=$(( (depth + 1) * 2 ))
+              indent=$((depth * 2))
               printf '%*s<li><a href="%s">%s</a></li>\n' "$indent" "" "$path" "$name"
             fi
           done >> _site/index.html
