@@ -100,7 +100,11 @@ jobs:
 
           while IFS= read -r path; do
             # TODO: count number of / in $path
-            depth=$(echo "$path" | tr -cd '/' | wc -c)
+            depth=0
+            if [[ -d "_site/$path" ]]; then
+              depth=$(echo "$path" | tr -cd '/' | wc -c)
+            else
+              depth=$(echo "$dir" | tr -cd '/' | wc -c)
           
             # CLOSE when depth decreases
             while (( prev_depth > depth )); do
