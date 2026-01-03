@@ -97,13 +97,13 @@ jobs:
           }
           ' | sort -t'|' -k2 | cut -d'|' -f2- | \
           prev_depth=0
-
           while IFS= read -r path; do
             # TODO: count number of / in $path
             depth=0
             if [[ -d "_site/$path" ]]; then
               depth=$(echo "$path" | tr -cd '/' | wc -c)
             else
+              dir=$(dirname "$path")
               depth=$(echo "$dir" | tr -cd '/' | wc -c)
             fi
           
@@ -113,7 +113,6 @@ jobs:
               printf '%*s</ul></details>\n' "$indent" ""
               ((prev_depth--))
             done
-          
             if [[ -d "_site/$path" ]]; then
               name=$(basename "$path")
               indent=$((depth * 2))
@@ -135,7 +134,7 @@ jobs:
             ((prev_depth--))
           done >> _site/index.html
 
-          # End HTML
+          # End of HTML
           cat >> _site/index.html <<'EOF'
             </ul>
           </body>
