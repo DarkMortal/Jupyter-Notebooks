@@ -56,7 +56,7 @@ jobs:
           <html lang="en">
           <head>
             <meta charset="utf-8">
-            <title>Jupyter Notebooks</title>
+            <title>DSA with Python</title>
             <style>
               :root { --indent: 1.8rem; }
               body {font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 2rem; line-height: 1.6; background:#ffffff; color:#1a1a1a;}
@@ -79,7 +79,7 @@ jobs:
             </style>
           </head>
           <body>
-            <h1>DSA with python</h1>
+            <h1>DSA with Python</h1>
             <h3>By Saptarshi Dey</h3>
             <ul id="tree">
           EOF
@@ -117,7 +117,7 @@ jobs:
               # File
               name=$(basename "$path")
               name="${name%.*}"
-              printf '%*s<li><a href="%s">%s</a></li>\n' "$fileIndent" "" "$path" "$name"
+              printf '%*s<li><a href="%s" target='_blank'>%s</a></li>\n' "$fileIndent" "" "$path" "$name"
             fi
           done >> _site/index.html
 
