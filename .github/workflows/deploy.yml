@@ -111,7 +111,7 @@ jobs:
               depth=$(echo "$path" | tr -cd '/' | wc -c)
               indent=$((depth * 2))
               printf '%*s<details><summary>%s/</summary><ul>\n' "$indent" "" "$name"
-              prev_depth=$depth
+              ((prev_depth++))
             else
               # File
               name=$(basename "$path")
