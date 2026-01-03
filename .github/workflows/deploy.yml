@@ -98,31 +98,31 @@ jobs:
           ' | sort -t'|' -k2 | cut -d'|' -f2- | \
           prev_depth=0
           while IFS= read -r path; do
-            # TODO: count number of / in $path
-            depth=$(echo "$path" | tr -cd '/' | wc -c)
-          
-            # CLOSE when depth decreases
-            while (( prev_depth > depth )); do
+            while (( prev_depth > 0 )); do
               indent=$((prev_depth * 2))
               printf '%*s</ul></details>\n' "$indent" ""
               ((prev_depth--))
             done
-            
+
+            # Check if folder exists
             if [[ -d "_site/$path" ]]; then
+              # Folder
               name=$(basename "$path")
+              depth=$(echo "$path" | tr -cd '/' | wc -c)
               indent=$((depth * 2))
-              printf '%*s<details><summary>%s/</summary><ul>\n' \
-                "$indent" "" "$name"
+              printf '%*s<details><summary>%s/</summary><ul>\n' "$indent" "" "$name"
+              prev_depth=$depth
             else
+              # File
               name=$(basename "$path")
+              dir=$(dirname "$path")
+              depth=$(echo "$dir" | tr -cd '/' | wc -c)
               indent=$((depth * 2))
-              printf '%*s<li><a href="%s">%s</a></li>\n' \
-                "$indent" "" "$path" "$name"
+              printf '%*s<li><a href="%s">%s</a></li>\n' "$indent" "" "$path" "$name"
             fi
-            prev_depth=$depth
           done >> _site/index.html
 
-          # === CLOSE ALL REMAINING TAGS IN REVERSE ORDER ===
+          # === CLOSE ALL REMIANING TAGS IN REVERSE ORDER ===
           while (( prev_depth > 0 )); do
             indent=$((prev_depth * 2))
             printf '%*s</ul></details>\n' "$indent" ""
