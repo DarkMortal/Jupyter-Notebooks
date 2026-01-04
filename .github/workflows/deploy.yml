@@ -59,27 +59,135 @@ jobs:
             <meta charset="utf-8">
             <title>DSA with Python</title>
             <style>
-              :root { --indent: 1.8rem; }
-              body {font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 2rem; line-height: 1.6; background:#ffffff; color:#1a1a1a;}
-              h1 {color:#2c3e50; margin-bottom:1.5rem; font-size:1.8rem;}
-              details {margin: 0.2rem 0;}
+              /* ===== RESET ===== */
+              * {
+                box-sizing: border-box;
+                -webkit-tap-highlight-color: transparent;
+              }
+          
+              body {
+                margin: 0;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                background: #f9fafb;
+                color: #111827;
+              }
+          
+              /* ===== HEADER ===== */
+              header {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                background: #ffffff;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 0.9rem 1rem;
+              }
+          
+              header h1 {
+                margin: 0;
+                font-size: 1.1rem;
+                font-weight: 600;
+              }
+          
+              /* ===== TREE ===== */
+              ul {
+                list-style: none;
+                padding-left: 0.75rem;
+                margin: 0;
+              }
+          
+              details {
+                margin: 0.3rem 0;
+              }
+          
               summary {
-                font-weight: 600; color: #2980b9; cursor: pointer; list-style: none; padding: 0.25rem 0;
-                position: relative; padding-left: var(--indent);
+                display: flex;
+                align-items: center;
+                padding: 0.6rem 0.5rem;
+                font-weight: 600;
+                cursor: pointer;
+                border-radius: 6px;
               }
+          
+              summary:hover {
+                background: #e5e7eb;
+              }
+          
+              summary::-webkit-details-marker {
+                display: none;
+              }
+          
               summary::before {
-                content: "→  "; position: absolute; left: 0; font-size: 1rem; width: 1.2rem; text-align: center;
+                content: "▸";
+                margin-right: 0.5rem;
+                transition: transform 0.15s ease;
               }
-              details[open] > summary::before { content: "↓  "; }
-              summary::-webkit-details-marker { display: none; }
-              ul {margin: 0.4rem 0 0.4rem calc(var(--indent)); padding: 0; list-style: none;}
-              li {margin: 0.3rem 0; position: relative; padding-left: 1.4rem;}
-              li::before {content: "•"; color: #7f8c8d; position: absolute; left: 0; font-weight: bold;}
-              a {color: #2980b9; text-decoration: none; font-family: 'Courier New', monospace; font-size: 0.95rem;}
-              a:hover {text-decoration: underline; color: #1a73e8;}
+          
+              details[open] > summary::before {
+                transform: rotate(90deg);
+              }
+          
+              li {
+                margin: 0.2rem 0;
+              }
+          
+              a {
+                display: block;
+                padding: 0.55rem 0.5rem;
+                text-decoration: none;
+                color: #2563eb;
+                border-radius: 6px;
+                font-size: 0.95rem;
+              }
+          
+              a:hover {
+                background: #e0e7ff;
+              }
+          
+              /* ===== MOBILE FIRST ===== */
+              @media (max-width: 640px) {
+                body {
+                  font-size: 15px;
+                }
+          
+                summary,
+                a {
+                  padding: 0.75rem;
+                }
+              }
+          
+              /* ===== DESKTOP ENHANCEMENT ===== */
+              @media (min-width: 768px) {
+                body {
+                  max-width: 900px;
+                  margin: auto;
+                }
+              }
+          
+              /* ===== DARK MODE ===== */
+              @media (prefers-color-scheme: dark) {
+                body {
+                  background: #0f172a;
+                  color: #e5e7eb;
+                }
+          
+                header {
+                  background: #020617;
+                  border-bottom-color: #1e293b;
+                }
+          
+                summary:hover,
+                a:hover {
+                  background: #1e293b;
+                }
+          
+                a {
+                  color: #60a5fa;
+                }
+              }
               .last-updated {
                 font-size: 0.85rem;
                 color: #7f8c8d;
+                margin-top
                 margin-bottom: 1rem;
               }
             </style>
