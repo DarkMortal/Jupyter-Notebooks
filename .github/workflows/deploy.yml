@@ -75,11 +75,11 @@ jobs:
                 font-size: larger;
                 overflow-x: hidden;
                 overflow-y: auto;
-                scroll-width: none;
+                scrollbar-width: none;
               }
 
               .container{
-                margin-left: 10%;
+                margin-left: 7%;
               }
           
               header {
@@ -162,7 +162,6 @@ jobs:
                 body {
                   font-size: 1rem;
                   overflow: auto;
-                  scroll-width: none;
                 }
           
                 summary,
