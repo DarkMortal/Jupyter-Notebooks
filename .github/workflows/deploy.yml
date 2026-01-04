@@ -69,8 +69,8 @@ jobs:
                 height: 100dvh;
                 width: 100vw;
                 font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-                background: #f9fafb;
-                color: #111827;
+                background: #0f172a;
+                color: #e5e7eb;
                 padding-left: 10%;
               }
           
@@ -78,7 +78,8 @@ jobs:
                 position: sticky;
                 top: 0;
                 z-index: 10;
-                background: #ffffff;
+                background: #020617;
+                border-bottom-color: #1e293b;
                 border-bottom: 1px solid #e5e7eb;
                 padding: 0.9rem 1rem;
               }
@@ -107,9 +108,9 @@ jobs:
                 cursor: pointer;
                 border-radius: 6px;
               }
-          
-              summary:hover {
-                background: #e5e7eb;
+
+              summary:hover, a:hover {
+                background: #1e293b;
               }
           
               summary::-webkit-details-marker {
@@ -134,7 +135,7 @@ jobs:
                 display: block;
                 padding: 0.55rem 0.5rem;
                 text-decoration: none;
-                color: #2563eb;
+                color: #60a5fa;
                 border-radius: 6px;
                 font-size: 0.95rem;
               }
@@ -146,7 +147,7 @@ jobs:
               /* ===== MOBILE FIRST ===== */
               @media (max-width: 640px) {
                 body {
-                  font-size: 0.8rem;
+                  font-size: 1rem;
                   overflow: auto;
                   scroll-width: none;
                 }
@@ -154,28 +155,6 @@ jobs:
                 summary,
                 a {
                   padding: 0.75rem;
-                }
-              }
-          
-              /* ===== DARK MODE ===== */
-              @media (prefers-color-scheme: dark) {
-                body {
-                  background: #0f172a;
-                  color: #e5e7eb;
-                }
-          
-                header {
-                  background: #020617;
-                  border-bottom-color: #1e293b;
-                }
-          
-                summary:hover,
-                a:hover {
-                  background: #1e293b;
-                }
-          
-                a {
-                  color: #60a5fa;
                 }
               }
               .last-updated {
