@@ -71,7 +71,10 @@ jobs:
                 font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                 background: #0f172a;
                 color: #e5e7eb;
-                padding-left: 10%;
+              }
+
+              .container{
+                margin-left: 10%;
               }
           
               header {
@@ -164,7 +167,7 @@ jobs:
               }
             </style>
           </head>
-          <body>
+          <body><div class="container">
             <h1>DSA with Python</h1>
             <h3>By Saptarshi Dey</h3>
             <span class="last-updated">
@@ -218,7 +221,7 @@ jobs:
 
           # End HTML
           cat >> _site/index.html <<'EOF'
-            </ul>
+            </ul></div>
           </body>
           </html>
           EOF
