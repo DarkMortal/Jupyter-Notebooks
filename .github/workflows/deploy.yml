@@ -59,20 +59,21 @@ jobs:
             <meta charset="utf-8">
             <title>DSA with Python</title>
             <style>
-              /* ===== RESET ===== */
               * {
                 box-sizing: border-box;
                 -webkit-tap-highlight-color: transparent;
               }
           
-              body {
+              html, body {
                 margin: 0;
+                height: 100dvh;
+                width: 100vw;
                 font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                 background: #f9fafb;
                 color: #111827;
+                padding-left: 10%;
               }
           
-              /* ===== HEADER ===== */
               header {
                 position: sticky;
                 top: 0;
@@ -88,7 +89,6 @@ jobs:
                 font-weight: 600;
               }
           
-              /* ===== TREE ===== */
               ul {
                 list-style: none;
                 padding-left: 0.75rem;
@@ -146,20 +146,14 @@ jobs:
               /* ===== MOBILE FIRST ===== */
               @media (max-width: 640px) {
                 body {
-                  font-size: 15px;
+                  font-size: 0.8rem;
+                  overflow: auto;
+                  scroll-width: none;
                 }
           
                 summary,
                 a {
                   padding: 0.75rem;
-                }
-              }
-          
-              /* ===== DESKTOP ENHANCEMENT ===== */
-              @media (min-width: 768px) {
-                body {
-                  max-width: 900px;
-                  margin: auto;
                 }
               }
           
@@ -187,8 +181,7 @@ jobs:
               .last-updated {
                 font-size: 0.85rem;
                 color: #7f8c8d;
-                margin-top
-                margin-bottom: 1rem;
+                margin-bottom: 1.2rem;
               }
             </style>
           </head>
@@ -229,7 +222,7 @@ jobs:
               # Folder
               name=$(basename "$path")
               prev_depth=$((prev_depth + 1))
-              printf '%*s<details><summary>%s/</summary><ul>\n' "$fileIndent" "" "$name"
+              printf '%*s<details><summary>%s</summary><ul>\n' "$dirIndent" "" "$name"
             else
               # File
               name=$(basename "$path")
