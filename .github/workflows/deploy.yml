@@ -57,6 +57,7 @@ jobs:
           <html lang="en">
           <head>
             <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
             <title>DSA with Python</title>
             <style>
               * {
@@ -72,6 +73,9 @@ jobs:
                 background: #0f172a;
                 color: #e5e7eb;
                 font-size: larger;
+                overflow-x: hidden;
+                overflow-y: auto;
+                scroll-width: none;
               }
 
               .container{
